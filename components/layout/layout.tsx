@@ -25,7 +25,11 @@ export const Layout = ({ children }: Props) => {
     >
       <section className="flex">
         <SidebarWrapper />
-        <NavbarWrapper>{children}</NavbarWrapper>
+        <NavbarWrapper>
+          <div className="px-8">
+            {children}
+          </div>
+        </NavbarWrapper>
       </section>
     </SidebarContext.Provider>
   );
