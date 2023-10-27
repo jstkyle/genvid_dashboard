@@ -1,14 +1,19 @@
 import type { NextPage } from "next";
+import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@nextui-org/react";
 import { LandingPage } from "../components/landingpage/landing/landing";
 import { MainLayout } from "../layout/mainlayout";
 import { LanguageFlags } from "../components/landingpage/FlagSection/flagsection";
+import { About_1 } from "../components/landingpage/About/About_1";
+import { About_2 } from "../components/landingpage/About/About_2";
+import { PricingSection } from "../components/landingpage/PricingSection/PricingSection";
+import { TypingEffect } from "../components/landingpage/TypingEffect/TypingEffect";
 
 const landing: NextPage = () => {
   return (
     <MainLayout>
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 py-8">
         <section>
           <div className="container mx-auto px-4 py-6">
             <div className="flex flex-col lg:flex-row justify-between items-center">
@@ -20,7 +25,6 @@ const landing: NextPage = () => {
                         src="/images/avatar/a.jpg"
                         alt="Banner Cover"
                         fill={true}
-                        objectFit="cover"
                       />
                     </div>
                     <div className="w-10 h-10 border-2 border-white rounded-full overflow-hidden relative">
@@ -28,7 +32,6 @@ const landing: NextPage = () => {
                         src="/images/avatar/b.jpg"
                         alt="Avatar"
                         fill={true}
-                        objectFit="cover"
                       />
                     </div>
                     <div className="w-10 h-10 border-2 border-white rounded-full overflow-hidden relative">
@@ -36,7 +39,6 @@ const landing: NextPage = () => {
                         src="/images/avatar/c.jpg"
                         alt="Avatar"
                         fill={true}
-                        objectFit="cover"
                       />
                     </div>
                     <div className="w-10 h-10 border-2 border-white rounded-full overflow-hidden relative">
@@ -44,16 +46,13 @@ const landing: NextPage = () => {
                         src="/images/avatar/d.jpg"
                         alt="Avatar"
                         fill={true}
-                        objectFit="cover"
                       />
                     </div>
                     <p className="font-semibold ml-4">
                       <span className="text-red-500">5k+</span> Enrollment
                     </p>
                   </div>
-                  <h1 className="font-bold text-3xl lg:text-6xl mt-6 mb-4">
-                    Master Any Language with AI
-                  </h1>
+                  <TypingEffect />
                   <p className="text-gray-600 text-md lg:text-lg mb-6">
                     Discover the future of language learning. Our AI avatar
                     tutor adapts to your pace, ensuring you converse like a
@@ -63,12 +62,14 @@ const landing: NextPage = () => {
                     <Button className="bg-red-500 text-white py-2 px-4 rounded-lg">
                       <p className="text-medium font-bold">Sign Up Now</p>
                     </Button>
-                    <Button
-                      color="primary"
-                      className="text-white py-2 px-4 rounded-lg"
-                    >
-                      <p className="text-medium font-bold">Try Our Demo</p>
-                    </Button>
+                    <Link href="/dashboard">
+                      <Button
+                        color="primary"
+                        className="text-white py-2 px-4 rounded-lg"
+                      >
+                        <p className="text-medium font-bold">Try Our Demo</p>
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -76,12 +77,11 @@ const landing: NextPage = () => {
               <div className="w-full lg:w-1/2 px-4">
                 <div className="relative w-full h-64 lg:h-auto">
                   <Image
-                    src="/images/banner-cover-1.png"
+                    src="/images/online_tutoring.png"
                     alt="Banner Cover"
-                    layout="responsive"
                     width={1000}
                     height={1000}
-                    objectFit="cover"
+                    className="rounded-2xl"
                   />
                 </div>
               </div>
@@ -90,6 +90,15 @@ const landing: NextPage = () => {
         </section>
         <section className="py-8">
           <LanguageFlags />
+        </section>
+        <section className="py-8">
+          <About_1 />
+        </section>
+        <section className="py-8">
+          <About_2 />
+        </section>
+        <section className="py-8">
+          <PricingSection />
         </section>
       </div>
     </MainLayout>
