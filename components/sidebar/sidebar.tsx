@@ -19,6 +19,7 @@ import { FilterIcon } from "../icons/sidebar/filter-icon";
 import { useSidebarContext } from "../layout/layout-context";
 import { ChangeLogIcon } from "../icons/sidebar/changelog-icon";
 import { useRouter } from "next/router";
+import AvatalkrLogo from "./AvatalkrLogo2";
 
 export const SidebarWrapper = () => {
   const router = useRouter();
@@ -35,7 +36,7 @@ export const SidebarWrapper = () => {
         })}
       >
         <div className={Sidebar.Header()}>
-          <CompaniesDropdown />
+          <AvatalkrLogo size="w-12" />
         </div>
         <div className="flex flex-col justify-between h-full">
           <div className={Sidebar.Body()}>
@@ -45,50 +46,33 @@ export const SidebarWrapper = () => {
               isActive={router.pathname === "/dashboard"}
               href="dashboard"
             />
-            <SidebarMenu title="Main Menu">
-              <SidebarItem
-                isActive={router.pathname === "/accounts"}
-                title="Avatars"
-                icon={<AccountsIcon />}
-                href="accounts"
-              />
-              <SidebarItem
-                isActive={router.pathname === "/payments"}
-                title="Payments"
-                icon={<PaymentsIcon />}
-              />
-              <CollapseItems
-                icon={<BalanceIcon />}
-                items={["Banks Accounts", "Credit Cards", "Loans"]}
-                title="Balances"
-              />
-            </SidebarMenu>
-
-            <SidebarMenu title="General">
-              <SidebarItem
-                isActive={router.pathname === "/developers"}
-                title="Developers"
-                icon={<DevIcon />}
-              />
-              <SidebarItem
-                isActive={router.pathname === "/view"}
-                title="View Test Data"
-                icon={<ViewIcon />}
-              />
-              <SidebarItem
-                isActive={router.pathname === "/settings"}
-                title="Settings"
-                icon={<SettingsIcon />}
-              />
-            </SidebarMenu>
-
-            <SidebarMenu title="Updates">
-              <SidebarItem
-                isActive={router.pathname === "/changelog"}
-                title="Changelog"
-                icon={<ChangeLogIcon />}
-              />
-            </SidebarMenu>
+            <SidebarItem
+              isActive={router.pathname === "/accounts"}
+              title="Avatars"
+              icon={<AccountsIcon />}
+              href="accounts"
+            />
+            <SidebarItem
+              isActive={router.pathname === "/payments"}
+              title="Payments"
+              icon={<PaymentsIcon />}
+            />
+            <CollapseItems
+              icon={<BalanceIcon />}
+              items={["Banks Accounts", "Credit Cards", "Loans"]}
+              title="Balances"
+            />
+            <SidebarItem
+              isActive={router.pathname === "/developers"}
+              title="Developers"
+              icon={<DevIcon />}
+              href="developers"
+            />
+            <SidebarItem
+              isActive={router.pathname === "/settings"}
+              title="Settings"
+              icon={<SettingsIcon />}
+            />
           </div>
           <div className={Sidebar.Footer()}>
             <Tooltip content={"Settings"} color="primary">
