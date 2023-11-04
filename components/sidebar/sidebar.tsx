@@ -69,6 +69,12 @@ export const SidebarWrapper = () => {
               href="developers"
             />
             <SidebarItem
+              isActive={router.pathname === "/stream-video"}
+              title="stream-video"
+              icon={<DevIcon />}
+              href="stream-video"
+            />
+            <SidebarItem
               isActive={router.pathname === "/settings"}
               title="Settings"
               icon={<SettingsIcon />}
