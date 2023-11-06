@@ -9,6 +9,8 @@ export const Content = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const serverAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [videoData, setVideoData] = useState(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const startRecording = () => {
     navigator.mediaDevices
@@ -64,20 +66,17 @@ export const Content = () => {
       // Here you check if the response is okay and the content type is audio
       if (
         response.ok &&
-        response.headers.get("content-type")?.includes("audio")
+        response.headers.get("content-type")?.includes("application/json")
       ) {
-        // Create a blob URL from the response audio blob
-        const responseAudioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(responseAudioBlob);
-        // Set the API response (audio file blob URL) for the server audio player
-        setApiResponse(audioUrl);
+        const jsonResponse = await response.json();
+        setVideoData(jsonResponse.videoUrl);
       } else {
         // Handle any errors or unexpected responses
-        setApiResponse("An error occurred. Please try again.");
+        console.error("Response not OK or not JSON");
       }
     } catch (error) {
       console.error("Error sending audio to the API:", error);
-      setApiResponse("An error occurred. Please try again.");
+      // setApiResponse("An error occurred. Please try again.");
     }
 
     setIsLoading(false);
@@ -108,9 +107,17 @@ export const Content = () => {
           {isLoading ? <CircularProgress color="primary" /> : "Run"}
         </Button>
       </div>
-      {apiResponse && (
+      {/* Display the video received from the API response */}
+      {videoData && (
         <div className="mb-4">
-          <audio controls src={apiResponse} ref={serverAudioRef} />
+          {/* Here 'videoData' is the state or prop holding the video URL */}
+          <video
+            controls
+            src={videoData}
+            width="720"
+            height="auto"
+            ref={videoRef}
+          />
         </div>
       )}
     </div>

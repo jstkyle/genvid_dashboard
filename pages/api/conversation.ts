@@ -69,32 +69,21 @@ export default async (request: NextRequest) => {
       });
 
       if (response.ok) {
-        const audioBlob = await response.blob();
+        // Clone the response stream to avoid locking it.
+        const clonedResponse = response.clone();
+        // Set up the headers for the audio stream.
+        const headers = new Headers({
+          "Content-Type": "audio/mpeg",
+          "Content-Length": clonedResponse.headers.get("Content-Length") || "",
+          "Transfer-Encoding":
+            clonedResponse.headers.get("Transfer-Encoding") || "",
+        });
 
-        // Now pass this blob to your createVideoAudioPrediction function
-        try {
-          const predictionOutput = await wav2lip(audioBlob);
-          console.log("Prediction Output", predictionOutput);
-          // Set up headers for JSON response
-          const headers = {
-            "Content-Type": "application/json",
-          };
-
-          // Return the response with the video URL
-          return new NextResponse(
-            JSON.stringify({ videoUrl: predictionOutput }),
-            {
-              status: 200,
-              headers: headers,
-            }
-          );
-        } catch (error) {
-          console.error("Failed to create video/audio prediction", error);
-          // Handle the error, maybe return a response
-          return new NextResponse("Error processing video/audio prediction.", {
-            status: 500,
-          });
-        }
+        // Return the audio stream as the response from the Next.js API route.
+        return new NextResponse(clonedResponse.body, {
+          status: 200,
+          headers: headers,
+        });
       } else {
         // Handle errors or unsuccessful responses.
         const errorText = await response.text();
