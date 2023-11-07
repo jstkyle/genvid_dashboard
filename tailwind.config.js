@@ -12,7 +12,11 @@ module.exports = {
     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        kanit: ["Kanit", "sans-serif"], // This is the name you'll use in your Tailwind classes
+      },
+    },
   },
   darkMode: "class",
   plugins: [nextui()],

@@ -10,8 +10,7 @@ import {
   NavbarMenu,
   NavbarMenuItem,
 } from "@nextui-org/react";
-import { AcmeLogo } from "./AcmeLogo"; // Assuming you also converted AcmeLogo.jsx to AcmeLogo.tsx
-import AvatalkrLogo from "./AvatalkrLogo2";
+import SvgComponent from "./fluenci_logo";
 
 interface Props {
   children: React.ReactNode;
@@ -39,8 +38,10 @@ export const NavbarWrapper = ({ children }: Props) => {
           />
         </NavbarContent>
         <NavbarBrand>
-          <AvatalkrLogo size="w-12" />
-          <p className="mx-2 text-2xl font-extrabold text-inherit">AvaTalkr</p>
+          <SvgComponent />
+          <p className="mx-2 text-3xl font-kanit font-bold text-inherit">
+            Fluenci
+          </p>
         </NavbarBrand>
         {isMenuOpen && (
           <NavbarMenu>
