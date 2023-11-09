@@ -19,7 +19,7 @@ import { FilterIcon } from "../icons/sidebar/filter-icon";
 import { useSidebarContext } from "../layout/layout-context";
 import { ChangeLogIcon } from "../icons/sidebar/changelog-icon";
 import { useRouter } from "next/router";
-import AvatalkrLogo from "./AvatalkrLogo2";
+import SvgComponent from "./fluenci_logo";
 
 export const SidebarWrapper = () => {
   const router = useRouter();
@@ -36,7 +36,7 @@ export const SidebarWrapper = () => {
         })}
       >
         <div className={Sidebar.Header()}>
-          <AvatalkrLogo size="w-12" />
+          <SvgComponent />
         </div>
         <div className="flex flex-col justify-between h-full">
           <div className={Sidebar.Body()}>
@@ -53,9 +53,10 @@ export const SidebarWrapper = () => {
               href="accounts"
             />
             <SidebarItem
-              isActive={router.pathname === "/payments"}
-              title="Payments"
+              isActive={router.pathname === "/classroom"}
+              title="Classroom"
               icon={<PaymentsIcon />}
+              href="classroom"
             />
             <CollapseItems
               icon={<BalanceIcon />}
