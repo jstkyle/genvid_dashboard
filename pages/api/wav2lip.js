@@ -12,8 +12,8 @@ import Replicate from "replicate";
 // Initialize the S3 client
 const s3Client = new S3Client({
   credentials: {
-    accessKeyId: "AKIAX6S2NEH3IXJDRIV7",
-    secretAccessKey: "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",
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
   region: "ap-northeast-1",
 });

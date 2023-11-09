@@ -1,27 +1,29 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Hls from "hls.js"; // Assuming Hls.js is properly installed and has type definitions.
 
 const VideoPlayer = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [hlsInstance, setHlsInstance] = useState<Hls | null>(null);
+  const [lastTime, setLastTime] = useState(0);
 
   useEffect(() => {
-    // Ensure this code is not executed server-side
-    if (typeof window === "undefined") {
-      return;
-    }
+    const videoElement = videoRef.current;
 
-    // Dynamic import for HLS.js to make sure it runs on the client-side only
-    import("hls.js").then((Hls) => {
-      const hls = new Hls.default();
-      const videoElement = videoRef.current;
+    if (videoElement && Hls.isSupported()) {
+      const hls = new Hls();
+      setHlsInstance(hls);
+
+      const videoKeys = ["playlistcopy.m3u8"];
+      let currentVideoIndex = 0;
 
       const fetchPlaylist = async (videoKey: string) => {
         try {
           const res = await fetch(`/api/stream-video?video=${videoKey}`);
           const data = await res.json();
-          if (data.url && videoElement) {
+          if (data.url) {
             hls.loadSource(data.url);
             hls.attachMedia(videoElement);
-            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
               videoElement.play();
             });
           }
@@ -30,35 +32,54 @@ const VideoPlayer = () => {
         }
       };
 
-      // Array of video keys for your .m3u8 files
-      const videoKeys = ["clip1.m3u8", "clip2.m3u8", "clip3.m3u8"];
-
-      // Sequentially play each video
-      const playVideosInSequence = async () => {
-        for (const videoKey of videoKeys) {
-          await fetchPlaylist(videoKey);
-          // Wait for the current video to end before proceeding to the next one
-          await new Promise((resolve) => {
-            hls.on(Hls.Events.BUFFER_EOS, resolve);
-          });
+      const onVideoEnded = () => {
+        currentVideoIndex++;
+        if (currentVideoIndex < videoKeys.length) {
+          fetchPlaylist(videoKeys[currentVideoIndex]);
         }
       };
 
-      playVideosInSequence();
+      // Disable pause and seeking.
+      const disablePauseAndSeeking = () => {
+        if (videoElement.paused) {
+          videoElement.play();
+        } else {
+          const currentTime = videoElement.currentTime;
+          // If the current time is significantly different from the last time,
+          // we assume a seek operation has occurred and reset the time.
+          if (Math.abs(currentTime - lastTime) > 0.01) {
+            videoElement.currentTime = lastTime;
+          } else {
+            setLastTime(currentTime);
+          }
+        }
+      };
+
+      videoElement.addEventListener("ended", onVideoEnded);
+      videoElement.addEventListener("pause", disablePauseAndSeeking);
+      videoElement.addEventListener("seeking", disablePauseAndSeeking);
+
+      fetchPlaylist(videoKeys[currentVideoIndex]);
 
       // Clean up
       return () => {
+        videoElement.removeEventListener("ended", onVideoEnded);
+        videoElement.removeEventListener("pause", disablePauseAndSeeking);
+        videoElement.removeEventListener("seeking", disablePauseAndSeeking);
         if (hls) {
           hls.destroy();
         }
       };
-    });
+    }
   }, []);
 
   return (
-    <div>
-      <video ref={videoRef} controls autoPlay style={{ width: "100%" }} />
-    </div>
+    <video
+      ref={videoRef}
+      autoPlay
+      style={{ width: "100%" }}
+      // Controls are removed to disable default user interaction.
+    />
   );
 };
 
