@@ -8,7 +8,6 @@ import { CardAgents } from "./card-agents";
 import { CardTransactions } from "./card-transactions";
 import { Link } from "@nextui-org/react";
 import NextLink from "next/link";
-import { Calendar } from "../../@/components/ui/calendar";
 
 const Chart = dynamic(
   () => import("../charts/steam").then((mod) => mod.Steam),
