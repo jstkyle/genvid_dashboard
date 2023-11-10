@@ -6,10 +6,6 @@ const state: Props["series"] = [
     name: "Series1",
     data: [31, 40, 28, 51, 42, 109, 100],
   },
-  {
-    name: "Series2",
-    data: [11, 32, 45, 32, 34, 52, 41],
-  },
 ];
 
 const options: Props["options"] = {
@@ -35,7 +31,20 @@ const options: Props["options"] = {
   },
 
   xaxis: {
-    categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999],
+    categories: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     labels: {
       // show: false,
       style: {
@@ -63,7 +72,7 @@ const options: Props["options"] = {
     enabled: false,
   },
   grid: {
-    show: true,
+    show: false,
     borderColor: "hsl(var(--nextui-default-200))",
     strokeDashArray: 0,
     position: "back",
