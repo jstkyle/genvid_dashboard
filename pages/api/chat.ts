@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI, { toFile } from "openai";
 import { TranscriptionCreateParams } from "openai/resources/audio";
 import { wav2lip } from "./wav2lip"; // adjust the path as needed
+import { createMediaConvertJob } from "./mediaConvert";
 
 export const config = {
   runtime: "edge",
@@ -80,6 +81,7 @@ export default async (request: NextRequest) => {
             "Content-Type": "application/json",
           };
 
+          createMediaConvertJob(predictionOutput);
           // Return the response with the video URL
           return new NextResponse(
             JSON.stringify({ videoUrl: predictionOutput }),
