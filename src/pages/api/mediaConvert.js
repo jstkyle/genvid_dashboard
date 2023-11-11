@@ -2,6 +2,7 @@ const {
   MediaConvertClient,
   CreateJobCommand,
   DescribeEndpointsCommand,
+  GetJobCommand,
 } = require("@aws-sdk/client-mediaconvert");
 
 // Initialize MediaConvert client without the endpoint
@@ -15,6 +16,7 @@ const mediaconvert = new MediaConvertClient({
 });
 
 export async function createMediaConvertJob(inputUrl) {
+  const outputDestination = `s3://clips-queue/tssegments/`;
   const params = {
     // Job settings go here
     Role: "arn:aws:iam::546724192758:role/mp4toTs",
@@ -36,14 +38,14 @@ export async function createMediaConvertJob(inputUrl) {
           OutputGroupSettings: {
             Type: "HLS_GROUP_SETTINGS",
             HlsGroupSettings: {
-              Destination: "s3://clips-queue/tssegments/",
+              Destination: outputDestination,
               MinSegmentLength: 0,
-              SegmentLength: 10, // Length of each TS segment in seconds
+              SegmentLength: 20, // Length of each TS segment in seconds
             },
           },
           Outputs: [
             {
-              NameModifier: "_1",
+              NameModifier: "_og",
               // Specify codec settings, etc.
               ContainerSettings: {
                 Container: "M3U8",
@@ -99,8 +101,30 @@ export async function createMediaConvertJob(inputUrl) {
 
   try {
     const data = await mediaconvert.send(createJobCommand);
-    console.log("Success", data.Job);
+    console.log("MediaConvert job created:", data.Job.Id);
+    return data.Job.Id; // Return the Job ID
   } catch (err) {
-    console.error("Error", err);
+    console.error("Error creating MediaConvert job:", err);
+    throw err;
   }
+}
+
+export async function waitForMediaConvertJobCompletion(jobId) {
+  let status = null;
+  do {
+    try {
+      const data = await mediaconvert.send(new GetJobCommand({ Id: jobId }));
+      status = data.Job.Status;
+      if (status === "COMPLETE" || status === "ERROR") {
+        break;
+      }
+      console.log("Waiting for job to complete, current status:", status);
+      await new Promise((resolve) => setTimeout(resolve, 30000)); // Wait for 30 seconds before checking again
+    } catch (err) {
+      console.error("Error checking MediaConvert job status:", err);
+      throw err;
+    }
+  } while (status !== "COMPLETE" && status !== "ERROR");
+
+  return status;
 }

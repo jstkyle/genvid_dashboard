@@ -3,6 +3,7 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { Readable } from "stream";
+import { createMediaConvertJob } from "./mediaConvert";
 
 const credentials = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -12,7 +13,7 @@ const region = "ap-northeast-1"; // Your AWS region
 // Your S3 and bucket configuration
 const s3Client = new S3Client({ region, credentials });
 const bucketName = "clips-queue";
-const folderPrefix = "videos/"; // Your folder prefix in the S3 bucket
+const folderPrefix = "tssegments/"; // Your folder prefix in the S3 bucket
 export default async function handler(req, res) {
   const videoKey = req.query.video;
 
