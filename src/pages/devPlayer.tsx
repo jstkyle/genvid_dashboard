@@ -22,7 +22,7 @@ const VideoPlayer = () => {
   ]; // Replace with actual URLs
   const videoKeys = ["playlist.m3u8"];
 
-  const loadPlaylist = async (url) => {
+  const loadPlaylist = async (url: string) => {
     const videoElement = videoRef.current;
     if (videoElement && Hls.isSupported()) {
       const hls = new Hls();
