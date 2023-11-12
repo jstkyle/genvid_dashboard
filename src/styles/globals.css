@@ -12,3 +12,22 @@ body {
 * {
   box-sizing: border-box;
 }
+
+@keyframes flashing {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.flashing {
+  animation: flashing 1s infinite;
+}
+
+.card-body {
+  max-width: 20rem; /* Example width - you can set this to whatever you like */
+  word-wrap: break-word;
+}
