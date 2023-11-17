@@ -54,7 +54,7 @@ export async function wav2lip(audioBlob) {
 
     let prediction = await replicate.deployments.predictions.create(
       "fang299",
-      "wav2lip",
+      "fluenci-lip-sync",
       {
         input: {
           fps: 25,

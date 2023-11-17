@@ -4,32 +4,44 @@ import { Button } from "@nextui-org/react";
 const VideoPlayer = () => {
   const videoRef = useRef(null);
   const [sourceBuffer, setSourceBuffer] = useState(null);
-  const [mediaSource, setMediaSource] = useState(new MediaSource());
+  const [mediaSource, setMediaSource] = useState(null); // Set to null initially
   const [currentClipIndex, setCurrentClipIndex] = useState(0);
   const vidClips = [
+    "https://replicate.delivery/pbxt/v0RDApORPZ4tCtl19zNYGhKBVEQrsZYVRNhxaF9AppSXkUeIA/result_voice.mp4",
+    "/videos/clip1_frag.mp4",
+    "https://replicate.delivery/pbxt/GfsFGIGRwP3hPCHGy0jzYBIIjH1Ac7Q9rqg269wxPOY5Ip8IA/result_voice.mp4",
     "/videos/clip1_frag.mp4",
     "/videos/clip2_frag.mp4",
     "/videos/clip3_frag.mp4",
   ];
 
   useEffect(() => {
-    const objectURL = URL.createObjectURL(mediaSource);
-    videoRef.current.src = objectURL;
+    // Instantiate MediaSource when on the client side
+    if (typeof window !== "undefined" && !mediaSource) {
+      setMediaSource(new MediaSource());
+    }
+  }, [mediaSource]);
 
-    const sourceOpenHandler = () => {
-      const newSourceBuffer = mediaSource.addSourceBuffer(
-        'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'
-      );
-      setSourceBuffer(newSourceBuffer);
-    };
+  useEffect(() => {
+    if (mediaSource) {
+      const objectURL = URL.createObjectURL(mediaSource);
+      videoRef.current.src = objectURL;
 
-    mediaSource.addEventListener("sourceopen", sourceOpenHandler);
+      const sourceOpenHandler = () => {
+        const newSourceBuffer = mediaSource.addSourceBuffer(
+          'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'
+        );
+        setSourceBuffer(newSourceBuffer);
+      };
 
-    return () => {
-      mediaSource.removeEventListener("sourceopen", sourceOpenHandler);
-      URL.revokeObjectURL(objectURL);
-    };
-  }, []);
+      mediaSource.addEventListener("sourceopen", sourceOpenHandler);
+
+      return () => {
+        mediaSource.removeEventListener("sourceopen", sourceOpenHandler);
+        URL.revokeObjectURL(objectURL);
+      };
+    }
+  }, [mediaSource]);
 
   const appendSegment = async () => {
     if (sourceBuffer && !sourceBuffer.updating) {
@@ -56,7 +68,7 @@ const VideoPlayer = () => {
   return (
     <div>
       <video ref={videoRef} width="480" height="320" autoPlay />
-      <Button onClick={appendSegment} color="primary">
+      <Button onClick={appendSegment} color="primary" auto>
         Append Next Segment
       </Button>
     </div>
