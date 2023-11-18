@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Button, Avatar, Progress, Card, CardBody } from "@nextui-org/react";
-
+import { useFluenciStream } from "../fluenciStream/fluenciStream";
 // Initialize the Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -36,9 +36,10 @@ export const Page = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [videoData, setVideoData] = useState<string | null>(null);
   const [conversation, setConversation] = useState<Message[]>([]); // Use the Message type for the conversation state
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-
+  const initialClips = ["/videos/clip1_frag.mp4"];
+  // Use the custom hook to get the video player functionality
+  const { videoRef, appendClip } = useFluenciStream(initialClips);
   useEffect(() => {
     // Function to handle keydown events
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -126,7 +127,7 @@ export const Page = () => {
         response.headers.get("content-type")?.includes("application/json")
       ) {
         const jsonResponse = await response.json();
-        setVideoData(jsonResponse.videoUrl);
+        appendClip(jsonResponse.videoUrl);
 
         // Fetch and update the conversation with the latest messages
         const updatedMessages = await fetchMessages(sessionId);
@@ -158,7 +159,7 @@ export const Page = () => {
         >
           <CardBody
             className={`text-${
-              entry.role === "user" ? "white" : "black"
+              entry.role === "user" ? "black" : "black"
             } card-body`}
           >
             <p>{entry.content}</p>
@@ -204,20 +205,7 @@ export const Page = () => {
           English Conversation with Nikki
         </div>
         <div className="relative">
-          {/* Display the video received from the API response */}
-          {videoData ? (
-            <video
-              className="rounded-lg w-full"
-              autoPlay
-              src={videoData}
-              ref={videoRef}
-            />
-          ) : (
-            <video className="rounded-lg w-full" controls>
-              <source src="path-to-your-video.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          )}
+          <video ref={videoRef} width="640" height="360" autoPlay />
         </div>
         <div>
           <Button

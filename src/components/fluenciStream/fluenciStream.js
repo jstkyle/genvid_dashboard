@@ -1,14 +1,12 @@
-// fluenciStream.js
 import { useState, useEffect, useRef, useCallback } from "react";
 
 export const useFluenciStream = (initialClips) => {
   const videoRef = useRef(null);
   const [sourceBuffer, setSourceBuffer] = useState(null);
   const [mediaSource, setMediaSource] = useState(null);
-  const [clipQueue, setClipQueue] = useState(initialClips);
-  const [isInitialClipsLooping, setIsInitialClipsLooping] = useState(true);
+  const [clipQueue, setClipQueue] = useState([]);
+  const [currentClipIndex, setCurrentClipIndex] = useState(0);
 
-  // Initialize MediaSource when on the client side
   useEffect(() => {
     if (typeof window !== "undefined" && !mediaSource) {
       const newMediaSource = new MediaSource();
@@ -16,9 +14,8 @@ export const useFluenciStream = (initialClips) => {
     }
   }, [mediaSource]);
 
-  // Create an object URL for the mediaSource and set up the sourceBuffer
   useEffect(() => {
-    if (mediaSource) {
+    if (mediaSource && videoRef.current) {
       const objectURL = URL.createObjectURL(mediaSource);
       videoRef.current.src = objectURL;
 
@@ -30,7 +27,6 @@ export const useFluenciStream = (initialClips) => {
       };
 
       mediaSource.addEventListener("sourceopen", sourceOpenHandler);
-
       return () => {
         mediaSource.removeEventListener("sourceopen", sourceOpenHandler);
         URL.revokeObjectURL(objectURL);
@@ -39,12 +35,13 @@ export const useFluenciStream = (initialClips) => {
   }, [mediaSource]);
 
   const appendClip = useCallback(
-    async (clipUrl, isInitialClip = false) => {
-      if (
-        sourceBuffer &&
-        !sourceBuffer.updating &&
-        mediaSource.readyState === "open"
-      ) {
+    async (clipUrl) => {
+      if (sourceBuffer && mediaSource.readyState === "open") {
+        if (sourceBuffer.updating) {
+          setTimeout(() => appendClip(clipUrl), 500);
+          return;
+        }
+
         try {
           const response = await fetch(clipUrl);
           if (!response.ok) {
@@ -62,10 +59,9 @@ export const useFluenciStream = (initialClips) => {
           }
 
           sourceBuffer.appendBuffer(data);
-
-          if (!isInitialClip) {
-            setIsInitialClipsLooping(false); // Stop looping the initial clips once a new clip is appended
-          }
+          setClipQueue((prevQueue) =>
+            prevQueue.filter((url) => url !== clipUrl)
+          );
         } catch (e) {
           console.error("Error fetching/appending segment:", e);
         }
@@ -76,13 +72,12 @@ export const useFluenciStream = (initialClips) => {
     [sourceBuffer, mediaSource, videoRef]
   );
 
-  // Loop through the initial clips
   useEffect(() => {
-    const loopInitialClips = async () => {
-      if (isInitialClipsLooping) {
-        for (const clipUrl of initialClips) {
-          await appendClip(clipUrl, true);
-        }
+    const loopInitialClips = () => {
+      if (clipQueue.length === 0) {
+        const clipUrl = initialClips[currentClipIndex];
+        appendClip(clipUrl);
+        setCurrentClipIndex((index) => (index + 1) % initialClips.length);
       }
     };
 
@@ -93,47 +88,24 @@ export const useFluenciStream = (initialClips) => {
     ) {
       loopInitialClips();
     }
-  }, [
-    initialClips,
-    isInitialClipsLooping,
-    mediaSource,
-    sourceBuffer,
-    appendClip,
-  ]);
+  }, [mediaSource, sourceBuffer, appendClip, currentClipIndex]);
 
   useEffect(() => {
     const sourceBufferUpdateEndHandler = () => {
       if (clipQueue.length > 0) {
         const nextClipUrl = clipQueue.shift();
-        setClipQueue([...clipQueue]);
         appendClip(nextClipUrl);
-      } else if (isInitialClipsLooping) {
-        // Continue looping initial clips if no new clips are queued
-        for (const clipUrl of initialClips) {
-          appendClip(clipUrl, true);
-        }
       }
     };
 
     sourceBuffer?.addEventListener("updateend", sourceBufferUpdateEndHandler);
-
     return () => {
       sourceBuffer?.removeEventListener(
         "updateend",
         sourceBufferUpdateEndHandler
       );
     };
-  }, [
-    sourceBuffer,
-    clipQueue,
-    appendClip,
-    initialClips,
-    isInitialClipsLooping,
-  ]);
+  }, [sourceBuffer, clipQueue, appendClip]);
 
-  return {
-    videoRef,
-    appendClip,
-    setClipQueue,
-  };
+  return { videoRef, appendClip };
 };
