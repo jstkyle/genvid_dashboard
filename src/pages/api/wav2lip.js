@@ -33,7 +33,7 @@ export async function wav2lip(audioBlob) {
     // Get signed URLs for the video and audio files
     const videoCommand = new GetObjectCommand({
       Bucket: bucketName,
-      Key: "videos/clip1.mp4",
+      Key: "videos/MaleVid.mp4",
     });
 
     const audioCommand = new GetObjectCommand({

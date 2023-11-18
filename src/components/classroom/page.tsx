@@ -37,9 +37,13 @@ export const Page = () => {
   const [videoData, setVideoData] = useState<string | null>(null);
   const [conversation, setConversation] = useState<Message[]>([]); // Use the Message type for the conversation state
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const initialClips = ["/videos/clip1_frag.mp4"];
+  const initialClips = ["/videos/Male1.mp4"];
+  const fillerClipUrl = ["/videos/Male2.mp4", "/videos/Male3.mp4"];
   // Use the custom hook to get the video player functionality
-  const { videoRef, appendClip } = useFluenciStream(initialClips);
+  const { videoRef, appendClip } = useFluenciStream(
+    initialClips,
+    fillerClipUrl
+  );
   useEffect(() => {
     // Function to handle keydown events
     const handleKeyDown = (event: KeyboardEvent) => {
